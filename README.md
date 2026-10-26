@@ -12,7 +12,7 @@
 
 ## Processo de caracterização
 
-Os testes foram adicionados antes das refatorações. Eles registram respostas de erro, cálculos, limites, efeitos colaterais, conteúdo do arquivo, histórico e mensagens impressas.
+A suíte inicial de caracterização foi adicionada antes das refatorações e registra respostas de erro, cálculos, limites, efeitos colaterais, conteúdo do arquivo, histórico e mensagens impressas. Uma verificação complementar do frete para `MA` foi adicionada depois, para reforçar a preservação dessa diferença histórica.
 
 ## Histórico de refatoração e relação com SOLID
 
@@ -45,5 +45,7 @@ Esta atividade busca refatorar sem alterar o comportamento observável. Por isso
 7. `refactor: extract order persistence and notification` — extrai operações para métodos nomeados; reduz o tamanho de `processar_pedido`.
 8. `refactor: isolate CSV persistence in repository` — cria um repositório dedicado, restaurando SRP no que diz respeito à persistência e permitindo substituição por injeção.
 9. `refactor: isolate order notification service` — cria um notificador dedicado, restaurando SRP no que diz respeito à notificação e permitindo substituição por injeção.
+10. `test: cover regional freight behavior and document refactoring` — adiciona teste complementar e documenta a análise.
+11. `chore: ignore Python test artifacts` — evita que caches locais sejam incluídos no repositório.
 
 Os passos 3–7 melhoram a separação de responsabilidades dentro da classe, mas não eliminam sozinhos o smell de classe com múltiplas responsabilidades. Os passos 8–9 separam essas responsabilidades em colaboradores distintos. A injeção de repositório/notificador prepara o código para DIP e testes com dublês; a criação padrão dos colaboradores ainda instancia implementações concretas, portanto o DIP pode ser aprofundado com Protocols/abstrações e composição externa.
