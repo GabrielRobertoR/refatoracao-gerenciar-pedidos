@@ -52,21 +52,8 @@ class GerenciadorPedidos:
 
         endereco = rua + ", " + numero + ", " + cidade + "/" + uf + ", CEP " + cep
 
-        try:
-            f = open("pedidos.csv", "a", encoding="utf-8")
-            f.write(nome + ";" + email + ";" + tipo_cliente + ";" + pagamento + ";"
-                    + str(total) + ";" + endereco + "\n")
-            f.close()
-        except OSError as e:
-            print("Falha ao salvar pedido: " + str(e))
-
-        mensagem = "Ola " + nome + ", seu pedido foi confirmado. "
-        if tipo_cliente == "VIP":
-            mensagem += "Obrigado por ser VIP! Frete gratis garantido. "
-        elif tipo_cliente == "FUNCIONARIO":
-            mensagem += "Desconto de colaborador aplicado. "
-        mensagem += "Total: R$ " + "%.2f" % total + ". Entrega em: " + endereco
-        print("[EMAIL para " + email + "] " + mensagem)
+        self._salvar_pedido(nome, email, tipo_cliente, pagamento, total, endereco)
+        self._enviar_confirmacao(nome, email, tipo_cliente, total, endereco)
 
         self.historico.append(nome + "|" + tipo_cliente + "|" + str(total))
         self.total_vendido += total
@@ -112,6 +99,24 @@ class GerenciadorPedidos:
                 total = total * (1 + 0.0199 * parcelas)
             return total, None
         return None, "ERRO: forma de pagamento invalida"
+
+    def _salvar_pedido(self, nome, email, tipo_cliente, pagamento, total, endereco):
+        try:
+            f = open("pedidos.csv", "a", encoding="utf-8")
+            f.write(nome + ";" + email + ";" + tipo_cliente + ";" + pagamento + ";"
+                    + str(total) + ";" + endereco + "\n")
+            f.close()
+        except OSError as e:
+            print("Falha ao salvar pedido: " + str(e))
+
+    def _enviar_confirmacao(self, nome, email, tipo_cliente, total, endereco):
+        mensagem = "Ola " + nome + ", seu pedido foi confirmado. "
+        if tipo_cliente == "VIP":
+            mensagem += "Obrigado por ser VIP! Frete gratis garantido. "
+        elif tipo_cliente == "FUNCIONARIO":
+            mensagem += "Desconto de colaborador aplicado. "
+        mensagem += "Total: R$ " + "%.2f" % total + ". Entrega em: " + endereco
+        print("[EMAIL para " + email + "] " + mensagem)
 
     def calcular_orcamento(self, tipo_cliente, uf):
         subtotal = self._calcular_subtotal()
