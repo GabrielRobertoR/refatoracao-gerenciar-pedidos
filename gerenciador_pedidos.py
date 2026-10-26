@@ -1,6 +1,18 @@
+class RepositorioPedidosCSV:
+    def salvar(self, nome, email, tipo_cliente, pagamento, total, endereco):
+        try:
+            f = open("pedidos.csv", "a", encoding="utf-8")
+            f.write(nome + ";" + email + ";" + tipo_cliente + ";" + pagamento + ";"
+                    + str(total) + ";" + endereco + "\n")
+            f.close()
+        except OSError as e:
+            print("Falha ao salvar pedido: " + str(e))
+
+
 class GerenciadorPedidos:
 
-    def __init__(self):
+    def __init__(self, repositorio=None):
+        self.repositorio = repositorio if repositorio is not None else RepositorioPedidosCSV()
         self.itens = []
         self.estoque = {}
         self.historico = []
@@ -52,7 +64,7 @@ class GerenciadorPedidos:
 
         endereco = rua + ", " + numero + ", " + cidade + "/" + uf + ", CEP " + cep
 
-        self._salvar_pedido(nome, email, tipo_cliente, pagamento, total, endereco)
+        self.repositorio.salvar(nome, email, tipo_cliente, pagamento, total, endereco)
         self._enviar_confirmacao(nome, email, tipo_cliente, total, endereco)
 
         self.historico.append(nome + "|" + tipo_cliente + "|" + str(total))
@@ -99,15 +111,6 @@ class GerenciadorPedidos:
                 total = total * (1 + 0.0199 * parcelas)
             return total, None
         return None, "ERRO: forma de pagamento invalida"
-
-    def _salvar_pedido(self, nome, email, tipo_cliente, pagamento, total, endereco):
-        try:
-            f = open("pedidos.csv", "a", encoding="utf-8")
-            f.write(nome + ";" + email + ";" + tipo_cliente + ";" + pagamento + ";"
-                    + str(total) + ";" + endereco + "\n")
-            f.close()
-        except OSError as e:
-            print("Falha ao salvar pedido: " + str(e))
 
     def _enviar_confirmacao(self, nome, email, tipo_cliente, total, endereco):
         mensagem = "Ola " + nome + ", seu pedido foi confirmado. "
