@@ -35,14 +35,7 @@ class GerenciadorPedidos:
         if desconto is None:
             return "ERRO: tipo de cliente desconhecido"
 
-        frete = 0
-        if uf == "PE":
-            frete = 12.5
-        elif (uf == "PB" or uf == "AL" or uf == "RN" or uf == "BA"
-              or uf == "SE" or uf == "CE" or uf == "PI" or uf == "MA"):
-            frete = 22.9
-        else:
-            frete = 39.9
+        frete = self._calcular_frete(uf, incluir_ma=True)
         if subtotal - desconto > 300 or tipo_cliente == "VIP":
             frete = 0
 
@@ -105,19 +98,20 @@ class GerenciadorPedidos:
             return subtotal * 0.20
         return None
 
+    def _calcular_frete(self, uf, incluir_ma):
+        if uf == "PE":
+            return 12.5
+        estados_regionais = ("PB", "AL", "RN", "BA", "SE", "CE", "PI")
+        if uf in estados_regionais or (incluir_ma and uf == "MA"):
+            return 22.9
+        return 39.9
+
     def calcular_orcamento(self, tipo_cliente, uf):
         subtotal = self._calcular_subtotal()
         desconto = self._calcular_desconto(subtotal, tipo_cliente)
         if desconto is None:
             desconto = 0
-        frete = 0
-        if uf == "PE":
-            frete = 12.5
-        elif (uf == "PB" or uf == "AL" or uf == "RN" or uf == "BA"
-              or uf == "SE" or uf == "CE" or uf == "PI"):
-            frete = 22.9
-        else:
-            frete = 39.9
+        frete = self._calcular_frete(uf, incluir_ma=False)
         if subtotal - desconto > 300 or tipo_cliente == "VIP":
             frete = 0
         return round((subtotal - desconto + frete) * 100.0) / 100.0
