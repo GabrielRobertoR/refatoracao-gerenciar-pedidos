@@ -29,9 +29,7 @@ class GerenciadorPedidos:
             if self.estoque[item[0]] < int(item[1]):
                 return "ERRO: estoque insuficiente " + item[0]
 
-        subtotal = 0
-        for item in self.itens:
-            subtotal += int(item[1]) * float(item[2])
+        subtotal = self._calcular_subtotal()
 
         desconto = 0
         if tipo_cliente == "COMUM":
@@ -98,10 +96,14 @@ class GerenciadorPedidos:
         self.itens.clear()
         return "OK: " + "%.2f" % total
 
-    def calcular_orcamento(self, tipo_cliente, uf):
+    def _calcular_subtotal(self):
         subtotal = 0
         for item in self.itens:
             subtotal += int(item[1]) * float(item[2])
+        return subtotal
+
+    def calcular_orcamento(self, tipo_cliente, uf):
+        subtotal = self._calcular_subtotal()
         desconto = 0
         if tipo_cliente == "COMUM":
             if subtotal > 500:
