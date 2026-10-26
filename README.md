@@ -33,3 +33,17 @@ python -m pytest -v
 ## Observação de escopo
 
 Esta atividade busca refatorar sem alterar o comportamento observável. Por isso, a diferença já existente para o frete do estado `MA` entre `calcular_orcamento` e `processar_pedido` foi mantida e caracterizada em teste. Uma correção dessa regra seria uma mudança funcional separada.
+
+### Commits realizados
+
+1. `chore: add original order manager` — preserva a versão inicial.
+2. `test: characterize existing order manager behavior` — adiciona a suíte inicial antes das refatorações.
+3. `refactor: extract order subtotal calculation` — extrai subtotal; aproxima o código do SRP e reduz o método longo.
+4. `refactor: centralize customer discount rules` — remove duplicação das regras de desconto; melhora coesão e aproxima o SRP.
+5. `refactor: extract shipping cost calculation` — isola o cálculo do frete; melhora coesão e aproxima o SRP.
+6. `refactor: extract payment total calculation` — isola o cálculo do pagamento; melhora coesão e aproxima o SRP.
+7. `refactor: extract order persistence and notification` — extrai operações para métodos nomeados; reduz o tamanho de `processar_pedido`.
+8. `refactor: isolate CSV persistence in repository` — cria um repositório dedicado, restaurando SRP no que diz respeito à persistência e permitindo substituição por injeção.
+9. `refactor: isolate order notification service` — cria um notificador dedicado, restaurando SRP no que diz respeito à notificação e permitindo substituição por injeção.
+
+Os passos 3–7 melhoram a separação de responsabilidades dentro da classe, mas não eliminam sozinhos o smell de classe com múltiplas responsabilidades. Os passos 8–9 separam essas responsabilidades em colaboradores distintos. A injeção de repositório/notificador prepara o código para DIP e testes com dublês; a criação padrão dos colaboradores ainda instancia implementações concretas, portanto o DIP pode ser aprofundado com Protocols/abstrações e composição externa.

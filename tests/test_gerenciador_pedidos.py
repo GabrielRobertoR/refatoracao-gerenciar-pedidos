@@ -119,6 +119,13 @@ def test_cartao_com_parcelas_invalidas_retorna_erro(gerente, parcelas):
     assert processar(gerente, pagamento="CARTAO", parcelas=parcelas) == "ERRO: parcelas invalidas"
 
 
+def test_processamento_usa_frete_regional_para_ma(gerente, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    gerente.adicionar_item("CANETA", 1, 10)
+
+    assert processar(gerente, uf="MA") == "OK: 31.25"
+
+
 def test_processamento_pix_atualiza_estoque_historico_total_e_limpa_itens(gerente, tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     gerente.adicionar_item("CANETA", 2, 10)
