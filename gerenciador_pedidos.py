@@ -9,10 +9,22 @@ class RepositorioPedidosCSV:
             print("Falha ao salvar pedido: " + str(e))
 
 
+class NotificadorPedido:
+    def enviar_confirmacao(self, nome, email, tipo_cliente, total, endereco):
+        mensagem = "Ola " + nome + ", seu pedido foi confirmado. "
+        if tipo_cliente == "VIP":
+            mensagem += "Obrigado por ser VIP! Frete gratis garantido. "
+        elif tipo_cliente == "FUNCIONARIO":
+            mensagem += "Desconto de colaborador aplicado. "
+        mensagem += "Total: R$ " + "%.2f" % total + ". Entrega em: " + endereco
+        print("[EMAIL para " + email + "] " + mensagem)
+
+
 class GerenciadorPedidos:
 
-    def __init__(self, repositorio=None):
+    def __init__(self, repositorio=None, notificador=None):
         self.repositorio = repositorio if repositorio is not None else RepositorioPedidosCSV()
+        self.notificador = notificador if notificador is not None else NotificadorPedido()
         self.itens = []
         self.estoque = {}
         self.historico = []
@@ -65,7 +77,7 @@ class GerenciadorPedidos:
         endereco = rua + ", " + numero + ", " + cidade + "/" + uf + ", CEP " + cep
 
         self.repositorio.salvar(nome, email, tipo_cliente, pagamento, total, endereco)
-        self._enviar_confirmacao(nome, email, tipo_cliente, total, endereco)
+        self.notificador.enviar_confirmacao(nome, email, tipo_cliente, total, endereco)
 
         self.historico.append(nome + "|" + tipo_cliente + "|" + str(total))
         self.total_vendido += total
@@ -111,15 +123,6 @@ class GerenciadorPedidos:
                 total = total * (1 + 0.0199 * parcelas)
             return total, None
         return None, "ERRO: forma de pagamento invalida"
-
-    def _enviar_confirmacao(self, nome, email, tipo_cliente, total, endereco):
-        mensagem = "Ola " + nome + ", seu pedido foi confirmado. "
-        if tipo_cliente == "VIP":
-            mensagem += "Obrigado por ser VIP! Frete gratis garantido. "
-        elif tipo_cliente == "FUNCIONARIO":
-            mensagem += "Desconto de colaborador aplicado. "
-        mensagem += "Total: R$ " + "%.2f" % total + ". Entrega em: " + endereco
-        print("[EMAIL para " + email + "] " + mensagem)
 
     def calcular_orcamento(self, tipo_cliente, uf):
         subtotal = self._calcular_subtotal()
