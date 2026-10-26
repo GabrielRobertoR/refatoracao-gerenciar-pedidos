@@ -40,17 +40,11 @@ class GerenciadorPedidos:
             frete = 0
 
         total = subtotal - desconto + frete
-        if pagamento == "PIX":
-            total = total * 0.95
-        elif pagamento == "BOLETO":
-            total = total + 2.5
-        elif pagamento == "CARTAO":
-            if parcelas < 1 or parcelas > 12:
-                return "ERRO: parcelas invalidas"
-            if parcelas > 3:
-                total = total * (1 + 0.0199 * parcelas)
-        else:
-            return "ERRO: forma de pagamento invalida"
+        total, erro_pagamento = self._calcular_total_pagamento(
+            total, pagamento, parcelas
+        )
+        if erro_pagamento:
+            return erro_pagamento
         total = round(total * 100.0) / 100.0
 
         for item in self.itens:
@@ -105,6 +99,19 @@ class GerenciadorPedidos:
         if uf in estados_regionais or (incluir_ma and uf == "MA"):
             return 22.9
         return 39.9
+
+    def _calcular_total_pagamento(self, total, pagamento, parcelas):
+        if pagamento == "PIX":
+            return total * 0.95, None
+        if pagamento == "BOLETO":
+            return total + 2.5, None
+        if pagamento == "CARTAO":
+            if parcelas < 1 or parcelas > 12:
+                return None, "ERRO: parcelas invalidas"
+            if parcelas > 3:
+                total = total * (1 + 0.0199 * parcelas)
+            return total, None
+        return None, "ERRO: forma de pagamento invalida"
 
     def calcular_orcamento(self, tipo_cliente, uf):
         subtotal = self._calcular_subtotal()
