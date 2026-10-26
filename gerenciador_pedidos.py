@@ -31,18 +31,8 @@ class GerenciadorPedidos:
 
         subtotal = self._calcular_subtotal()
 
-        desconto = 0
-        if tipo_cliente == "COMUM":
-            if subtotal > 500:
-                desconto = subtotal * 0.05
-        elif tipo_cliente == "VIP":
-            if subtotal > 500:
-                desconto = subtotal * 0.15
-            else:
-                desconto = subtotal * 0.10
-        elif tipo_cliente == "FUNCIONARIO":
-            desconto = subtotal * 0.20
-        else:
+        desconto = self._calcular_desconto(subtotal, tipo_cliente)
+        if desconto is None:
             return "ERRO: tipo de cliente desconhecido"
 
         frete = 0
@@ -102,19 +92,24 @@ class GerenciadorPedidos:
             subtotal += int(item[1]) * float(item[2])
         return subtotal
 
-    def calcular_orcamento(self, tipo_cliente, uf):
-        subtotal = self._calcular_subtotal()
-        desconto = 0
+    def _calcular_desconto(self, subtotal, tipo_cliente):
         if tipo_cliente == "COMUM":
             if subtotal > 500:
-                desconto = subtotal * 0.05
-        elif tipo_cliente == "VIP":
+                return subtotal * 0.05
+            return 0
+        if tipo_cliente == "VIP":
             if subtotal > 500:
-                desconto = subtotal * 0.15
-            else:
-                desconto = subtotal * 0.10
-        elif tipo_cliente == "FUNCIONARIO":
-            desconto = subtotal * 0.2
+                return subtotal * 0.15
+            return subtotal * 0.10
+        if tipo_cliente == "FUNCIONARIO":
+            return subtotal * 0.20
+        return None
+
+    def calcular_orcamento(self, tipo_cliente, uf):
+        subtotal = self._calcular_subtotal()
+        desconto = self._calcular_desconto(subtotal, tipo_cliente)
+        if desconto is None:
+            desconto = 0
         frete = 0
         if uf == "PE":
             frete = 12.5
